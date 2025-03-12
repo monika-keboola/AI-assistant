@@ -1,6 +1,12 @@
+// Add a global flag to prevent mention modal from showing after message is sent
+window.preventMentionModal = false;
+
 document.addEventListener('DOMContentLoaded', function() {
     // Create AI Assistant element
     createAIAssistant();
+    
+    // Create the floating button
+    createFloatingButton();
     
     // Initialize AI Assistant functionality
     initAIAssistant();
@@ -8,6 +14,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initially hide the AI Assistant
     const aiAssistant = document.querySelector('.ai-assistant');
     aiAssistant.style.display = 'none';
+    
+    // Show floating button immediately
+    const floatingButton = document.querySelector('.floating-button');
+    if (floatingButton) {
+        floatingButton.style.display = 'flex';
+        floatingButton.style.position = 'fixed';
+        floatingButton.style.right = '32px';
+        floatingButton.style.bottom = '32px';
+    }
     
     // Ensure both submit buttons are disabled on page load
     document.querySelector('.submit-btn').disabled = true;
@@ -41,6 +56,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const aiAssistant = document.querySelector('.ai-assistant');
             if (aiAssistant.style.display === 'none') {
                 aiAssistant.style.display = 'flex';
+                
+                // Hide the floating button when the chat opens
+                const floatingButton = document.querySelector('.floating-button');
+                if (floatingButton) {
+                    floatingButton.style.display = 'none';
+                }
             }
             if (aiAssistant.classList.contains('collapsed')) {
                 toggleAIAssistant();
@@ -76,6 +97,12 @@ function showWelcomeMessageAndOpenChat() {
     // Show the AI Assistant
     const aiAssistant = document.querySelector('.ai-assistant');
     aiAssistant.style.display = 'flex';
+    
+    // Hide the floating button when chat opens
+    const floatingButton = document.querySelector('.floating-button');
+    if (floatingButton) {
+        floatingButton.style.display = 'none';
+    }
     
     // First remove the default welcome message
     const messagesContainer = document.querySelector('.ai-assistant-messages');
@@ -184,7 +211,7 @@ function createActionCardWithDocIcon(title, description, url) {
     rightSvgIcon.setAttribute("fill", "none");
     
     const rightPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    rightPath.setAttribute("d", "M11.998 3C11.595 3 11.2294 3.24375 11.0732 3.61875C10.917 3.99375 11.0045 4.42187 11.2888 4.70937L12.5822 6L8.29257 10.2937C7.90203 10.6844 7.90203 11.3188 8.29257 11.7094C8.68311 12.1 9.31734 12.1 9.70788 11.7094L13.9975 7.41563L15.291 8.70937C15.5784 8.99687 16.0065 9.08125 16.3814 8.925C16.7563 8.76875 17 8.40625 17 8V4C17 3.44687 16.5532 3 16.0002 3H11.998ZM5.49944 4C4.1185 4 3 5.11875 3 6.5V14.5C3 15.8813 4.1185 17 5.49944 17H13.4977C14.8786 17 15.9971 15.8813 15.9971 14.5V12C15.9971 11.4469 15.5503 11 14.9973 11C14.4443 11 13.9975 11.4469 13.9975 12V14.5C13.9975 14.775 13.7726 15 13.4977 15H5.49944C5.2245 15 4.99955 14.775 4.99955 14.5V6.5C4.99955 6.225 5.2245 6 5.49944 6H7.99888C8.55189 6 8.99866 5.55313 8.99866 5C8.99866 4.44687 8.55189 4 7.99888 4H5.49944Z");
+    rightPath.setAttribute("d", "M11.998 3C11.595 3 11.2294 3.24375 11.0732 3.61875C10.917 3.99375 11.0045 4.42187 11.2888 4.70937L12.5822 6L8.29257 10.2937C7.90203 10.6844 7.90203 11.3188 8.29257 11.7094C8.68342 12.1 9.31734 12.1 9.70788 11.7094L13.9975 7.41563L15.291 8.70937C15.5784 8.99687 16.0065 9.08125 16.3814 8.925C16.7563 8.76875 17 8.40625 17 8V4C17 3.44687 16.5532 3 16.0002 3H11.998ZM5.49944 4C4.1185 4 3 5.11875 3 6.5V14.5C3 15.8813 4.1185 17 5.49944 17H13.4977C14.8786 17 15.9971 15.8813 15.9971 14.5V12C15.9971 11.4469 15.5503 11 14.9973 11C14.4443 11 13.9975 11.4469 13.9975 12V14.5C13.9975 14.775 13.7726 15 13.4977 15H5.49944C5.2245 15 4.99955 14.775 4.99955 14.5V6.5C4.99955 6.225 5.2245 6 5.49944 6H7.99888C8.55189 6 8.99866 5.55313 8.99866 5C8.99866 4.44687 8.55189 4 7.99888 4H5.49944Z");
     rightPath.setAttribute("fill", "#7C8594");
     
     rightSvgIcon.appendChild(rightPath);
@@ -244,7 +271,9 @@ function createFloatingButton() {
     const floatingButton = document.createElement('div');
     floatingButton.className = 'floating-button';
     floatingButton.innerHTML = `<img src="images/chat_icon.png" alt="AI Assistant">`;
-    floatingButton.style.display = 'none'; // Initially hidden
+    
+    // Make the button visible by default instead of hidden
+    floatingButton.style.display = 'flex';
     
     floatingButton.addEventListener('click', function() {
         // Show the AI assistant and hide the floating button
@@ -341,854 +370,64 @@ function initAIAssistant() {
     });
     
     sendBtn.addEventListener('click', function() {
-        sendMessage();
-    });
-    
-    inputField.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-}
-
-
-// Toggle AI Assistant between default and collapsed states
-function toggleAIAssistant() {
-    const aiAssistant = document.querySelector('.ai-assistant');
-    
-    if (aiAssistant.classList.contains('collapsed')) {
-        // Expand to default state
-        aiAssistant.classList.remove('collapsed');
-        
-        // Reset position to right bottom corner when expanding from collapsed state
-        aiAssistant.style.top = 'auto';
-        aiAssistant.style.left = 'auto';
-        aiAssistant.style.right = '20px';
-        aiAssistant.style.bottom = '20px';
-        
-        // Update button colors
-        const resizeBtn = document.querySelector('.resize-btn');
-        resizeBtn.style.color = '#666';
-    } else {
-        // Collapse to small bubble
-        aiAssistant.classList.add('collapsed');
-        
-        // Close any open mention modals or tooltips when collapsing
-        if (typeof closeMentionModal === 'function') {
-            closeMentionModal();
-        }
-        
-        // Update button colors for collapsed state
-        const resizeBtn = document.querySelector('.resize-btn');
-        resizeBtn.style.color = 'white';
+        // Close mention modal immediately before sending message
+        // This follows standard dropdown behavior - closing on form submission
+        if (typeof window.closeMentionModal === 'function') {
+        window.closeMentionModal();
+        console.log("window.closeMentionModal() called");
     }
-}
-
-
-// Cycle through AI Assistant sizes - simplified to just toggle between default and expanded
-function cycleAIAssistantSize() {
-    const aiAssistant = document.querySelector('.ai-assistant');
-    const resizeBtn = document.querySelector('.resize-btn');
-    
-    // Don't toggle if the assistant is collapsed
-    if (aiAssistant.classList.contains('collapsed')) {
-        return;
-    }
-    
-    if (aiAssistant.classList.contains('expanded')) {
-        // If expanded, return to default size
-        aiAssistant.style.transition = 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        aiAssistant.classList.remove('expanded');
-        resizeBtn.innerHTML = '<img src="images/expand-icon.svg" alt="Expand">';
-        resizeBtn.title = "Expand";
-        
-        // Reset position to right bottom corner
-        aiAssistant.style.top = 'auto';
-        aiAssistant.style.left = 'auto';
-        aiAssistant.style.right = '20px';
-        aiAssistant.style.bottom = '20px';
-        
-        // Reset the body height to default
-        const aiAssistantBody = document.querySelector('.ai-assistant-body');
-        aiAssistantBody.style.transition = 'height 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        aiAssistantBody.style.height = '455px';
-    } else {
-        // If default size, expand
-        aiAssistant.style.transition = 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        aiAssistant.classList.add('expanded');
-        resizeBtn.innerHTML = '<img src="images/collapse-icon.svg" alt="Collapse">';
-        resizeBtn.title = "Collapse";
-        
-        // Position with 16px gap when expanding
-        if (aiAssistant.style.right !== 'auto') {
-            aiAssistant.style.right = '16px';
-        } else {
-            aiAssistant.style.left = '16px';
-        }
-        
-        // Adjust the body height to fill the expanded size
-        const aiAssistantBody = document.querySelector('.ai-assistant-body');
-        aiAssistantBody.style.transition = 'height 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        aiAssistantBody.style.height = 'calc(100% - 96px)';
-    }
-    
-    // Remove transition after animation completes
-    setTimeout(() => {
-        aiAssistant.style.transition = '';
-    }, 400);
-}
-
-
-// Make element draggable
-function makeElementDraggable(element, handle) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    let isDragging = false;
-    let wasExpanded = false;
-    let dropIndicators = [];
-    let currentDropPosition = null;
-    
-    if (handle) {
-        // If a handle is specified, use it for dragging
-        handle.onmousedown = dragMouseDown;
-        
-        // Add visual cue that header is draggable
-        handle.style.cursor = 'grab';
-    } else {
-        // Otherwise, use the entire element for dragging
-        element.onmousedown = dragMouseDown;
-    }
-    
-    function dragMouseDown(e) {
-        // Ignore if clicking on a button
-        if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-            return;
-        }
-        
-        e = e || window.event;
-        e.preventDefault();
-        
-        // Change cursor style during drag
-        if (handle) handle.style.cursor = 'grabbing';
-        
-        // Get the mouse cursor position at startup
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        
-        // Store if the element was expanded
-        wasExpanded = element.classList.contains('expanded');
-        
-        // Add a subtle transition for smoother movement
-        element.style.transition = 'none';
-        
-        // Create drop indicators when starting to drag
-        createDropIndicators();
-        
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
-    }
-    
-    function createDropIndicators() {
-        // Remove any existing indicators
-        removeDropIndicators();
-        
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        
-        // Check if the assistant is in expanded state
-        const isExpanded = element.classList.contains('expanded');
-        
-        if (isExpanded) {
-            // Create two full-height indicators for left and right sides when expanded
-            dropIndicators.push(createFullHeightIndicator('left', 16));
-            dropIndicators.push(createFullHeightIndicator('right', windowWidth - 16));
-        } else {
-            // Create simplified indicators for the four corners when not expanded
-            dropIndicators.push(createIndicator('top-left', 20, 20));
-            dropIndicators.push(createIndicator('top-right', windowWidth - 20, 20));
-            dropIndicators.push(createIndicator('bottom-left', 20, windowHeight - 20));
-            dropIndicators.push(createIndicator('bottom-right', windowWidth - 20, windowHeight - 20));
-        }
-    }
-    
-    function createFullHeightIndicator(position, x) {
-        const indicator = document.createElement('div');
-        indicator.className = 'drop-indicator';
-        indicator.dataset.position = position;
-        indicator.style.position = 'fixed';
-        indicator.style.width = '120px';
-        indicator.style.height = 'calc(100vh - 40px)';
-        indicator.style.borderRadius = '12px';
-        indicator.style.border = '2px dashed rgba(31, 143, 255, 0.3)';
-        indicator.style.backgroundColor = 'rgba(31, 143, 255, 0.05)';
-        indicator.style.zIndex = '999';
-        indicator.style.transition = 'all 0.2s ease';
-        indicator.style.pointerEvents = 'none';
-        indicator.style.boxShadow = 'none';
-        indicator.style.top = '20px';
-        
-        // Position the indicator
-        if (position === 'left') {
-            indicator.style.left = '16px';
-        } else {
-            indicator.style.right = '16px';
-        }
-        
-        document.body.appendChild(indicator);
-        return indicator;
-    }
-    
-    function createIndicator(position, x, y) {
-        const indicator = document.createElement('div');
-        indicator.className = 'drop-indicator';
-        indicator.dataset.position = position;
-        indicator.style.position = 'fixed';
-        indicator.style.width = '120px';
-        indicator.style.height = '120px';
-        indicator.style.borderRadius = '12px';
-        indicator.style.border = '2px dashed rgba(31, 143, 255, 0.3)';
-        indicator.style.backgroundColor = 'rgba(31, 143, 255, 0.05)';
-        indicator.style.zIndex = '999';
-        indicator.style.transition = 'all 0.2s ease';
-        indicator.style.pointerEvents = 'none';
-        indicator.style.boxShadow = 'none';
-        
-        // Position the indicator
-        switch (position) {
-            case 'top-left':
-                indicator.style.left = '20px';
-                indicator.style.top = '20px';
-                break;
-            case 'top-right':
-                indicator.style.right = '20px';
-                indicator.style.top = '20px';
-                break;
-            case 'bottom-left':
-                indicator.style.left = '20px';
-                indicator.style.bottom = '20px';
-                break;
-            case 'bottom-right':
-                indicator.style.right = '20px';
-                indicator.style.bottom = '20px';
-                break;
-        }
-        
-        document.body.appendChild(indicator);
-        return indicator;
-    }
-    
-    function removeDropIndicators() {
-        dropIndicators.forEach(indicator => {
-            if (indicator.parentNode) {
-                document.body.removeChild(indicator);
-            }
-        });
-        dropIndicators = [];
-    }
-    
-    function highlightClosestIndicator(chatCenterX, chatCenterY) {
-        // Reset all indicators to default state - no shadow, no scaling
-        dropIndicators.forEach(indicator => {
-            indicator.style.backgroundColor = 'rgba(31, 143, 255, 0.05)';
-            indicator.style.transform = 'scale(1)';
-            indicator.style.boxShadow = 'none';
-            indicator.style.border = '2px dashed rgba(31, 143, 255, 0.3)';
-        });
-        
-        // Check if the assistant is in expanded state
-        const isExpanded = element.classList.contains('expanded');
-        
-        if (isExpanded) {
-            // For expanded state, we only have left and right indicators
-            const windowWidth = window.innerWidth;
-            
-            // Calculate distance to each side
-            const distanceToLeft = chatCenterX - 20;
-            const distanceToRight = windowWidth - 20 - chatCenterX;
-            
-            // Find the minimum distance
-            const minDistance = Math.min(distanceToLeft, distanceToRight);
-            
-            // Only highlight if within a reasonable distance (200px)
-            if (minDistance > 200) {
-                return null;
-            }
-            
-            // Determine which side is closest and if we're moving toward it
-            let closestPosition;
-            let isMovingToward = false;
-            
-            // Calculate the previous center position (using the movement delta)
-            const prevChatCenterX = chatCenterX + pos1;
-            
-            if (minDistance === distanceToLeft) {
-                closestPosition = 'left';
-                // Check if we're moving toward left (decreasing distance)
-                const prevDistance = prevChatCenterX - 20;
-                isMovingToward = distanceToLeft < prevDistance;
-            } else {
-                closestPosition = 'right';
-                // Check if we're moving toward right
-                const prevDistance = windowWidth - 20 - prevChatCenterX;
-                isMovingToward = distanceToRight < prevDistance;
-            }
-            
-            if (closestPosition) {
-                const closestIndicator = dropIndicators.find(ind => ind.dataset.position === closestPosition);
-                
-                // Only apply any highlighting effects if moving toward the indicator
-                if (isMovingToward) {
-                    // Apply subtle background highlight
-                    closestIndicator.style.backgroundColor = 'rgba(31, 143, 255, 0.15)';
-                    closestIndicator.style.transform = 'scale(1.05)';
-                    closestIndicator.style.boxShadow = '0 0 15px rgba(31, 143, 255, 0.5)';
-                    closestIndicator.style.border = '2px dashed rgba(31, 143, 255, 0.7)';
-                }
-                
-                return closestPosition;
-            }
-            
-            return null;
-        } else {
-            // For non-expanded state, use the original corner-based logic
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            
-            // Calculate distance to each corner
-            const distanceToTopLeft = Math.sqrt(Math.pow(chatCenterX - 20, 2) + Math.pow(chatCenterY - 20, 2));
-            const distanceToTopRight = Math.sqrt(Math.pow(chatCenterX - (windowWidth - 20), 2) + Math.pow(chatCenterY - 20, 2));
-            const distanceToBottomLeft = Math.sqrt(Math.pow(chatCenterX - 20, 2) + Math.pow(chatCenterY - (windowHeight - 20), 2));
-            const distanceToBottomRight = Math.sqrt(Math.pow(chatCenterX - (windowWidth - 20), 2) + Math.pow(chatCenterY - (windowHeight - 20), 2));
-            
-            // Find the minimum distance
-            const minDistance = Math.min(distanceToTopLeft, distanceToTopRight, distanceToBottomLeft, distanceToBottomRight);
-            
-            // Only highlight if within a reasonable distance (200px)
-            if (minDistance > 200) {
-                return null;
-            }
-            
-            // Determine which corner is closest and if we're moving toward it
-            let closestPosition;
-            let isMovingToward = false;
-            
-            // Calculate the previous center position (using the movement delta)
-            const prevChatCenterX = chatCenterX + pos1;
-            const prevChatCenterY = chatCenterY + pos2;
-            
-            if (minDistance === distanceToTopLeft) {
-                closestPosition = 'top-left';
-                // Check if we're moving toward top-left (decreasing distance)
-                const prevDistance = Math.sqrt(Math.pow(prevChatCenterX - 20, 2) + Math.pow(prevChatCenterY - 20, 2));
-                isMovingToward = distanceToTopLeft < prevDistance;
-            } else if (minDistance === distanceToTopRight) {
-                closestPosition = 'top-right';
-                // Check if we're moving toward top-right
-                const prevDistance = Math.sqrt(Math.pow(prevChatCenterX - (windowWidth - 20), 2) + Math.pow(prevChatCenterY - 20, 2));
-                isMovingToward = distanceToTopRight < prevDistance;
-            } else if (minDistance === distanceToBottomLeft) {
-                closestPosition = 'bottom-left';
-                // Check if we're moving toward bottom-left
-                const prevDistance = Math.sqrt(Math.pow(prevChatCenterX - 20, 2) + Math.pow(prevChatCenterY - (windowHeight - 20), 2));
-                isMovingToward = distanceToBottomLeft < prevDistance;
-            } else if (minDistance === distanceToBottomRight) {
-                closestPosition = 'bottom-right';
-                // Check if we're moving toward bottom-right
-                const prevDistance = Math.sqrt(Math.pow(prevChatCenterX - (windowWidth - 20), 2) + Math.pow(prevChatCenterY - (windowHeight - 20), 2));
-                isMovingToward = distanceToBottomRight < prevDistance;
-            }
-            
-            if (closestPosition) {
-                const closestIndicator = dropIndicators.find(ind => ind.dataset.position === closestPosition);
-                
-                // Only apply any highlighting effects if moving toward the indicator
-                if (isMovingToward) {
-                    // Apply subtle background highlight
-                    closestIndicator.style.backgroundColor = 'rgba(31, 143, 255, 0.15)';
-                    closestIndicator.style.transform = 'scale(1.05)';
-                    closestIndicator.style.boxShadow = '0 0 15px rgba(31, 143, 255, 0.5)';
-                    closestIndicator.style.border = '2px dashed rgba(31, 143, 255, 0.7)';
-                }
-                
-                return closestPosition;
-            }
-            
-            return null;
-        }
-    }
-    
-    function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-        
-        // Calculate the new cursor position
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        
-        // Calculate new position
-        let newTop = element.offsetTop - pos2;
-        let newLeft = element.offsetLeft - pos1;
-        
-        // Add boundary constraints to prevent dragging off-screen
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        const elementWidth = element.offsetWidth;
-        const elementHeight = element.offsetHeight;
-        
-        // Keep at least 20px of the element visible on each edge
-        newTop = Math.max(20 - elementHeight, Math.min(newTop, windowHeight - 20));
-        newLeft = Math.max(20 - elementWidth, Math.min(newLeft, windowWidth - 20));
-        
-        // Set the element's new position
-        element.style.top = newTop + "px";
-        element.style.left = newLeft + "px";
-        
-        // Remove any right/bottom positioning that might interfere
-        element.style.right = "auto";
-        element.style.bottom = "auto";
-        
-        // Add a subtle shadow to indicate movement
-        element.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.2)';
-        
-        // Calculate the center of the chat element
-        const chatRect = element.getBoundingClientRect();
-        const chatCenterX = chatRect.left + chatRect.width / 2;
-        const chatCenterY = chatRect.top + chatRect.height / 2;
-        
-        // Highlight the closest drop indicator based on the chat's center position
-        currentDropPosition = highlightClosestIndicator(chatCenterX, chatCenterY);
-        
-        // Show visual feedback that the element is being dragged
-        isDragging = true;
-    }
-    
-    function closeDragElement() {
-        // Stop moving when mouse button is released
-        document.onmouseup = null;
-        document.onmousemove = null;
-        
-        // Reset cursor style
-        if (handle) handle.style.cursor = 'grab';
-        
-        // Check if the assistant is in expanded state
-        const isExpanded = element.classList.contains('expanded');
-        
-        // Position based on closest indicator if available
-        if (currentDropPosition) {
-            if (isExpanded) {
-                // For expanded state, position to left or right
-                if (currentDropPosition === 'left') {
-                    element.style.transition = 'top 0.3s ease, left 0.3s ease, right 0.3s ease, bottom 0.3s ease';
-                    element.style.left = '16px';
-                    element.style.right = 'auto';
-                } else {
-                    element.style.transition = 'top 0.3s ease, left 0.3s ease, right 0.3s ease, bottom 0.3s ease';
-                    element.style.right = '16px';
-                    element.style.left = 'auto';
-                }
-                // Keep top at 20px for expanded state
-                element.style.top = '20px';
-                element.style.bottom = 'auto';
-            } else {
-                // For non-expanded state, use the original corner positioning
-                positionToCorner(currentDropPosition);
-            }
-        } else {
-            // If no indicator is close, snap to the nearest edge
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            const rect = element.getBoundingClientRect();
-            
-            if (isExpanded) {
-                // For expanded state, snap to left or right based on position
-                const distanceToLeft = rect.left;
-                const distanceToRight = windowWidth - rect.right;
-                
-                if (distanceToLeft < distanceToRight) {
-                    element.style.transition = 'top 0.3s ease, left 0.3s ease, right 0.3s ease, bottom 0.3s ease';
-                    element.style.left = '16px';
-                    element.style.right = 'auto';
-                } else {
-                    element.style.transition = 'top 0.3s ease, left 0.3s ease, right 0.3s ease, bottom 0.3s ease';
-                    element.style.right = '16px';
-                    element.style.left = 'auto';
-                }
-                // Keep top at 20px for expanded state
-                element.style.top = '20px';
-                element.style.bottom = 'auto';
-            } else {
-                // For non-expanded state, use the original corner snapping
-                // Calculate distances to each corner
-                const distanceToTopLeft = Math.sqrt(Math.pow(rect.left, 2) + Math.pow(rect.top, 2));
-                const distanceToTopRight = Math.sqrt(Math.pow(windowWidth - rect.right, 2) + Math.pow(rect.top, 2));
-                const distanceToBottomLeft = Math.sqrt(Math.pow(rect.left, 2) + Math.pow(windowHeight - rect.bottom, 2));
-                const distanceToBottomRight = Math.sqrt(Math.pow(windowWidth - rect.right, 2) + Math.pow(windowHeight - rect.bottom, 2));
-                
-                // Find the minimum distance
-                const minDistance = Math.min(distanceToTopLeft, distanceToTopRight, distanceToBottomLeft, distanceToBottomRight);
-                
-                // Determine which corner is closest
-                if (minDistance === distanceToTopLeft) {
-                    positionToCorner('top-left');
-                } else if (minDistance === distanceToTopRight) {
-                    positionToCorner('top-right');
-                } else if (minDistance === distanceToBottomLeft) {
-                    positionToCorner('bottom-left');
-                } else {
-                    positionToCorner('bottom-right');
-                }
-            }
-        }
-        
-        // Remove drop indicators
-        removeDropIndicators();
-        
-        // Reset shadow
-        setTimeout(() => {
-            element.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.15)';
-            element.style.transition = 'box-shadow 0.3s ease';
-        }, 100);
-        
-        // If the assistant was expanded before dragging, keep it expanded
-        if (wasExpanded) {
-            element.classList.add('expanded');
-        }
-        
-        isDragging = false;
-    }
-    
-    function positionToCorner(position) {
-        // Create smooth transition for positioning
-        element.style.transition = 'top 0.3s ease, left 0.3s ease, right 0.3s ease, bottom 0.3s ease';
-        
-        // Position based on the corner
-        switch(position) {
-            case 'top-left':
-                element.style.top = '20px';
-                element.style.left = '20px';
-                element.style.right = 'auto';
-                element.style.bottom = 'auto';
-                break;
-            case 'top-right':
-                element.style.top = '20px';
-                element.style.right = '20px';
-                element.style.left = 'auto';
-                element.style.bottom = 'auto';
-                break;
-            case 'bottom-left':
-                element.style.bottom = '20px';
-                element.style.left = '20px';
-                element.style.top = 'auto';
-                element.style.right = 'auto';
-                break;
-            case 'bottom-right':
-                element.style.bottom = '20px';
-                element.style.right = '20px';
-                element.style.top = 'auto';
-                element.style.left = 'auto';
-                break;
-        }
-        
-        // Remove transition after positioning
-        setTimeout(() => {
-            element.style.transition = 'box-shadow 0.3s ease';
-        }, 300);
-    }
-}
-
-
-// Make element resizable
-function makeElementResizable(element, handle) {
-    let startX, startY, startWidth, startHeight;
-    
-    handle.addEventListener('mousedown', function(e) {
-        // Don't allow manual resizing when in expanded mode
-        if (element.classList.contains('expanded')) {
-            return;
-        }
-        
-        e.preventDefault();
-        startX = e.clientX;
-        startY = e.clientY;
-        startWidth = parseInt(document.defaultView.getComputedStyle(element).width, 10);
-        startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10);
-        
-        // Add transition for smoother resizing
-        element.style.transition = 'none';
-        
-        document.addEventListener('mousemove', resize);
-        document.addEventListener('mouseup', stopResize);
-    });
-    
-    function resize(e) {
-        // Set minimum dimensions
-        const newWidth = Math.max(300, startWidth + e.clientX - startX);
-        const newHeight = Math.max(400, startHeight + e.clientY - startY);
-        
-        element.style.width = newWidth + 'px';
-        element.style.height = newHeight + 'px';
-        
-        // Update body height when manually resizing
-        const aiAssistantBody = document.querySelector('.ai-assistant-body');
-        aiAssistantBody.style.transition = 'none';
-        aiAssistantBody.style.height = (newHeight - 96) + 'px'; // Adjust for header and footer
-        
-        // Update mention modal width if it exists and is visible
-        if (window.mentionModal && window.isMentioning) {
-            const inputField = document.querySelector('.ai-assistant-input');
-            const inputRect = inputField.getBoundingClientRect();
-            const aiAssistantRect = element.getBoundingClientRect();
-            
-            // Update modal width to match input field width
-            window.mentionModal.style.width = `${inputRect.width}px`;
-            
-            // Update modal position
-            window.mentionModal.style.bottom = `${aiAssistantRect.height - (inputRect.top - aiAssistantRect.top) + 8}px`;
-        }
-    }
-    
-    function stopResize() {
-        document.removeEventListener('mousemove', resize);
-        document.removeEventListener('mouseup', stopResize);
-        
-        // Add a smooth transition after resizing is complete
-        element.style.transition = 'box-shadow 0.3s ease';
-        
-        // Final update to mention modal after resize is complete
-        if (window.mentionModal && window.isMentioning) {
-            const inputField = document.querySelector('.ai-assistant-input');
-            const inputRect = inputField.getBoundingClientRect();
-            const aiAssistantRect = element.getBoundingClientRect();
-            
-            // Update modal width to match input field width
-            window.mentionModal.style.width = `${inputRect.width}px`;
-            
-            // Update modal position
-            window.mentionModal.style.bottom = `${aiAssistantRect.height - (inputRect.top - aiAssistantRect.top) + 8}px`;
-        }
-        
-        // Add a subtle animation to indicate resize completion
-        element.style.boxShadow = '0 6px 25px rgba(0, 0, 0, 0.2)';
-        setTimeout(() => {
-            element.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.15)';
-        }, 200);
-    }
-}
-
-
-// Define Keboola topics and their corresponding links and icons
-const keboolaTopics = {
-    'storage': {
-        title: 'Storage',
-        description: 'Manage your data storage in Keboola',
-        icon: 'images/table-icon.svg',
-        url: '#/storage',
-        type: 'keboola_part'
-    },
-    'transformations': {
-        title: 'Transformations',
-        description: 'Create and manage data transformations',
-        icon: 'images/snowflake-icon.svg',
-        url: '#/transformations',
-        type: 'keboola_part'
-    },
-    'flows': {
-        title: 'Flows',
-        description: 'Design and orchestrate your data workflows',
-        icon: 'images/flow-icon.svg',
-        url: '#/flows',
-        type: 'keboola_part'
-    },
-    'components': {
-        title: 'Components',
-        description: 'Browse available components and connectors',
-        icon: 'images/component-icon.svg',
-        url: '#/components',
-        type: 'keboola_part'
-    },
-    'workspaces': {
-        title: 'Workspaces',
-        description: 'Work with your data in SQL or Python environments',
-        icon: 'images/python-icon.svg',
-        url: '#/workspaces',
-        type: 'keboola_part'
-    },
-    'projects': {
-        title: 'Projects',
-        description: 'Manage your Keboola projects',
-        icon: 'images/project-icon.svg',
-        url: '#/projects',
-        type: 'keboola_part'
-    },
-    'storage_docs': {
-        title: 'Storage Documentation',
-        description: 'Learn about Keboola Storage features and usage',
-        icon: 'images/book-icon.svg',
-        url: 'https://help.keboola.com/storage/',
-        type: 'documentation'
-    },
-    'transformations_docs': {
-        title: 'Transformations Documentation',
-        description: 'Learn how to create and manage transformations',
-        icon: 'images/book-icon.svg',
-        url: 'https://help.keboola.com/transformations/',
-        type: 'documentation'
-    },
-    'flows_docs': {
-        title: 'Flows Documentation',
-        description: 'Learn how to design and orchestrate workflows',
-        icon: 'images/book-icon.svg',
-        url: 'https://help.keboola.com/orchestrator/',
-        type: 'documentation'
-    },
-    'components_docs': {
-        title: 'Components Documentation',
-        description: 'Learn about available components and connectors',
-        icon: 'images/book-icon.svg',
-        url: 'https://help.keboola.com/components/',
-        type: 'documentation'
-    },
-    'workspaces_docs': {
-        title: 'Workspaces Documentation',
-        description: 'Learn how to use SQL and Python environments',
-        icon: 'images/book-icon.svg',
-        url: 'https://help.keboola.com/transformations/workspace/',
-        type: 'documentation'
-    },
-    'projects_docs': {
-        title: 'Projects Documentation',
-        description: 'Learn how to manage Keboola projects',
-        icon: 'images/book-icon.svg',
-        url: 'https://help.keboola.com/management/',
-        type: 'documentation'
-    }
-};
-
-
-// Function to detect Keboola topics in user message
-function detectKeboolaTopics(message) {
-    const lowerMessage = message.toLowerCase();
-    const detectedTopics = [];
-    const detectedDocs = [];
-    
-    for (const topic in keboolaTopics) {
-        // Skip documentation topics in this loop
-        if (topic.endsWith('_docs')) continue;
-        
-        if (lowerMessage.includes(topic)) {
-            detectedTopics.push(topic);
-            // If documentation is mentioned, also add the documentation link
-            if (lowerMessage.includes('documentation') || lowerMessage.includes('docs') || lowerMessage.includes('help')) {
-                detectedDocs.push(`${topic}_docs`);
-            }
-        }
-    }
-    
-    // Also check for some common synonyms or related terms
-    if (lowerMessage.includes('table') || lowerMessage.includes('data storage')) {
-        if (!detectedTopics.includes('storage')) {
-            detectedTopics.push('storage');
-        }
-        if ((lowerMessage.includes('documentation') || lowerMessage.includes('docs') || lowerMessage.includes('help')) && !detectedDocs.includes('storage_docs')) {
-            detectedDocs.push('storage_docs');
-        }
-    }
-    
-    if (lowerMessage.includes('sql') || lowerMessage.includes('python')) {
-        if (!detectedTopics.includes('workspaces')) {
-            detectedTopics.push('workspaces');
-        }
-        if ((lowerMessage.includes('documentation') || lowerMessage.includes('docs') || lowerMessage.includes('help')) && !detectedDocs.includes('workspaces_docs')) {
-            detectedDocs.push('workspaces_docs');
-        }
-    }
-    
-    if (lowerMessage.includes('pipeline') || lowerMessage.includes('workflow')) {
-        if (!detectedTopics.includes('flows')) {
-            detectedTopics.push('flows');
-        }
-        if ((lowerMessage.includes('documentation') || lowerMessage.includes('docs') || lowerMessage.includes('help')) && !detectedDocs.includes('flows_docs')) {
-            detectedDocs.push('flows_docs');
-        }
-    }
-    
-    // Combine both arrays and return
-    return [...detectedTopics, ...detectedDocs];
-}
-
-
-// Function to create a link card HTML element
-function createLinkCard(topic) {
-    const topicInfo = keboolaTopics[topic];
-    
-    const card = document.createElement('a');
-    card.href = topicInfo.url;
-    card.className = 'keboola-link-card';
-    card.target = '_blank'; // Open in new tab
-    
-    const iconDiv = document.createElement('div');
-    iconDiv.className = 'keboola-link-icon';
-    
-    const icon = document.createElement('img');
-    icon.src = topicInfo.icon;
-    icon.alt = topicInfo.title;
-    icon.width = 20;
-    icon.height = 20;
-    
-    iconDiv.appendChild(icon);
-    
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'keboola-link-content';
-    
-    const title = document.createElement('div');
-    title.className = 'keboola-link-title';
-    title.textContent = topicInfo.title;
-    
-    const description = document.createElement('div');
-    description.className = 'keboola-link-description';
-    description.textContent = topicInfo.description;
-    
-    contentDiv.appendChild(title);
-    contentDiv.appendChild(description);
-    
-    // Add right icon based on link type
-    const rightIconDiv = document.createElement('div');
-    rightIconDiv.className = 'keboola-link-right-icon';
-    
-    const rightIcon = document.createElement('img');
-    if (topicInfo.type === 'documentation') {
-        rightIcon.src = 'images/external-link-icon.svg';
-        rightIcon.alt = 'External Link';
-    } else {
-        rightIcon.src = 'images/arrow-right-icon.svg';
-        rightIcon.alt = 'Go to';
-    }
-    rightIcon.width = 16;
-    rightIcon.height = 16;
-    
-    rightIconDiv.appendChild(rightIcon);
-    
-    card.appendChild(iconDiv);
-    card.appendChild(contentDiv);
-    card.appendChild(rightIconDiv);
-    
-    return card;
-}
-
-
-// Modify the sendMessage function to ensure link cards appear after bot messages
-function sendMessage() {
-    const input = document.querySelector('.ai-assistant-input');
-    const message = input.value.trim();
-    
-    if (message === '') return;
     
     // Add user message
     addMessage('user', message);
     
-    // Clear input
+    // Clear input and ensure mention state is completely reset
     input.value = '';
+    
+    // Explicitly reset all mention-related variables to prevent the modal from reappearing
+    if (window.isMentioning !== undefined) {
+        window.isMentioning = false;
+        console.log("Reset window.isMentioning to false");
+    }
+    if (window.mentionText !== undefined) {
+        window.mentionText = '';
+        console.log("Reset window.mentionText to empty");
+    }
+    
+    // Fully remove the mention modal from DOM if it exists
+    if (window.mentionModal && window.mentionModal.parentNode) {
+        console.log("Manually removing mention modal from DOM");
+        window.mentionModal.parentNode.removeChild(window.mentionModal);
+        window.mentionModal = null;
+    }
+    
+    // Fully remove the mention tooltip from DOM if it exists
+    if (window.mentionTooltip && window.mentionTooltip.parentNode) {
+        console.log("Manually removing mention tooltip from DOM");
+        window.mentionTooltip.parentNode.removeChild(window.mentionTooltip);
+        window.mentionTooltip = null;
+    }
+    
+    console.log("SEND MESSAGE - AFTER PROCESSING:");
+    console.log("Input value:", input.value);
+    console.log("Mention modal exists:", !!window.mentionModal);
+    console.log("Mention modal in DOM:", window.mentionModal ? !!window.mentionModal.parentNode : false);
+    console.log("window.isMentioning:", window.isMentioning);
+    console.log("window.preventMentionModal:", window.preventMentionModal);
+    
+    // Use setTimeout to clear the preventMentionModal flag after a short delay
+    setTimeout(() => {
+        window.preventMentionModal = false;
+        console.log("preventMentionModal flag cleared");
+    }, 500);
+    
+    // Use setTimeout to check if the mention modal reappears
+    setTimeout(() => {
+        console.log("SEND MESSAGE - AFTER TIMEOUT (100ms):");
+        console.log("Input value:", document.querySelector('.ai-assistant-input').value);
+        console.log("Mention modal exists:", !!window.mentionModal);
+        console.log("Mention modal in DOM:", window.mentionModal ? !!window.mentionModal.parentNode : false);
+        console.log("window.isMentioning:", window.isMentioning);
+    }, 100);
     
     // Detect if the message is about Keboola topics
     const detectedTopics = detectKeboolaTopics(message);
@@ -1295,7 +534,7 @@ function getNavigationDetails(section) {
             title: 'Flows',
             description: 'Create and manage your data pipelines',
             url: '/flows',
-            icon: 'M6.5 3C4.01875 3 2 5.01875 2 7.5C2 9.98125 4.01875 12 6.5 12C8.98125 12 11 9.98125 11 7.5C11 5.01875 8.98125 3 6.5 3ZM6.5 10C5.11875 10 4 8.88125 4 7.5C4 6.11875 5.11875 5 6.5 5C7.88125 5 9 6.11875 9 7.5C9 8.88125 7.88125 10 6.5 10ZM13.5 8C11.0188 8 9 10.0188 9 12.5C9 14.9812 11.0188 17 13.5 17C15.9812 17 18 14.9812 18 12.5C18 10.0188 15.9812 8 13.5 8ZM13.5 15C12.1188 15 11 13.8812 11 12.5C11 11.1188 12.1188 10 13.5 10C14.8812 10 16 11.1188 16 12.5C16 13.8812 14.8812 15 13.5 15ZM9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5ZM11 12.5C11 12.5 11 12.5 11 12.5C11 12.5 11 12.5 11 12.5C11 12.5 11 12.5 11 12.5Z'
+            icon: 'M6.5 3C4.01875 3 2 5.01875 2 7.5C2 9.98125 4.01875 12 6.5 12C8.98125 12 11 9.98125 11 7.5C11 5.01875 8.98125 3 6.5 3ZM6.5 10C5.11875 10 4 8.88125 4 7.5C4 6.11875 5.11875 5 6.5 5C7.88125 5 9 6.11875 9 7.5C9 8.88125 7.88125 10 6.5 10ZM13.5 8C11.0188 8 9 10.0188 9 12.5C9 14.9812 11.0188 17 13.5 17C15.9812 17 18 14.9812 18 12.5C18 10.0188 15.9812 8 13.5 8ZM13.5 15C12.1188 15 11 13.8812 11 12.5C11 11.1188 12.1188 10 13.5 10C14.8812 10 16 11.1188 16 12.5C16 13.8812 14.8812 15 13.5 15ZM9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5C9 7.5 9 7.5 9 7.5ZM11 12.5C11 12.5 11 12.5 11 12.5C11 12.5 11 12.5 11 12.5C11 12.5 11 12.5 11 12.5Z'
         },
         'transformations': {
             title: 'Transformations',
@@ -1528,7 +767,7 @@ function createDocumentationCard(docInfo) {
     rightSvgIcon.setAttribute("fill", "none");
     
     const rightPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    rightPath.setAttribute("d", "M11.998 3C11.595 3 11.2294 3.24375 11.0732 3.61875C10.917 3.99375 11.0045 4.42187 11.2888 4.70937L12.5822 6L8.29257 10.2937C7.90203 10.6844 7.90203 11.3188 8.29257 11.7094C8.68311 12.1 9.31734 12.1 9.70788 11.7094L13.9975 7.41563L15.291 8.70937C15.5784 8.99687 16.0065 9.08125 16.3814 8.925C16.7563 8.76875 17 8.40625 17 8V4C17 3.44687 16.5532 3 16.0002 3H11.998ZM5.49944 4C4.1185 4 3 5.11875 3 6.5V14.5C3 15.8813 4.1185 17 5.49944 17H13.4977C14.8786 17 15.9971 15.8813 15.9971 14.5V12C15.9971 11.4469 15.5503 11 14.9973 11C14.4443 11 13.9975 11.4469 13.9975 12V14.5C13.9975 14.775 13.7726 15 13.4977 15H5.49944C5.2245 15 4.99955 14.775 4.99955 14.5V6.5C4.99955 6.225 5.2245 6 5.49944 6H7.99888C8.55189 6 8.99866 5.55313 8.99866 5C8.99866 4.44687 8.55189 4 7.99888 4H5.49944Z");
+    rightPath.setAttribute("d", "M11.998 3C11.595 3 11.2294 3.24375 11.0732 3.61875C10.917 3.99375 11.0045 4.42187 11.2888 4.70937L12.5822 6L8.29257 10.2937C7.90203 10.6844 7.90203 11.3188 8.29257 11.7094C8.68342 12.1 9.31734 12.1 9.70788 11.7094L13.9975 7.41563L15.291 8.70937C15.5784 8.99687 16.0065 9.08125 16.3814 8.925C16.7563 8.76875 17 8.40625 17 8V4C17 3.44687 16.5532 3 16.0002 3H11.998ZM5.49944 4C4.1185 4 3 5.11875 3 6.5V14.5C3 15.8813 4.1185 17 5.49944 17H13.4977C14.8786 17 15.9971 15.8813 15.9971 14.5V12C15.9971 11.4469 15.5503 11 14.9973 11C14.4443 11 13.9975 11.4469 13.9975 12V14.5C13.9975 14.775 13.7726 15 13.4977 15H5.49944C5.2245 15 4.99955 14.775 4.99955 14.5V6.5C4.99955 6.225 5.2245 6 5.49944 6H7.99888C8.55189 6 8.99866 5.55313 8.99866 5C8.99866 4.44687 8.55189 4 7.99888 4H5.49944Z");
     rightPath.setAttribute("fill", "#7C8594");
     
     rightSvgIcon.appendChild(rightPath);
@@ -2074,55 +1313,57 @@ function expandFromMinimized() {
     const floatingButton = document.querySelector('.floating-button');
     
     // Fade out the floating button
-    floatingButton.style.transition = 'opacity 0.2s ease';
-    floatingButton.style.opacity = '0';
-    
-    // Use setTimeout to allow the fade-out to complete
-    setTimeout(() => {
-        // Hide the floating button
-        floatingButton.style.display = 'none';
+    if (floatingButton) {
+        floatingButton.style.transition = 'opacity 0.2s ease';
+        floatingButton.style.opacity = '0';
         
-        // Reset to default state regardless of previous state
-        aiAssistant.classList.remove('expanded');
-        
-        // If history view is active, switch back to chat view
-        if (aiAssistant.classList.contains('history-view')) {
-            hideHistoryView();
-        }
-        
-        // Position in right bottom corner
-        aiAssistant.style.top = 'auto';
-        aiAssistant.style.left = 'auto';
-        aiAssistant.style.right = '16px';
-        aiAssistant.style.bottom = '16px';
-        
-        // Reset the body height to default
-        const aiAssistantBody = document.querySelector('.ai-assistant-body');
-        aiAssistantBody.style.height = '350px';
-        
-        // Update resize button icon to expand
-        const resizeBtn = document.querySelector('.resize-btn');
-        resizeBtn.innerHTML = '<img src="images/expand-icon.svg" alt="Expand">';
-        resizeBtn.title = "Expand";
-        
-        // Set initial state for animation
-        aiAssistant.style.opacity = '0';
-        aiAssistant.style.transform = 'scale(0.3)';
-        aiAssistant.style.display = 'flex';
-        aiAssistant.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        
-        // Trigger reflow to ensure the animation works
-        aiAssistant.offsetHeight;
-        
-        // Animate to full size
-        aiAssistant.style.opacity = '1';
-        aiAssistant.style.transform = 'scale(1)';
-        
-        // Remove transition after animation completes
+        // Use setTimeout to allow the fade-out to complete
         setTimeout(() => {
-            aiAssistant.style.transition = '';
-        }, 300);
-    }, 200);
+            // Hide the floating button
+            floatingButton.style.display = 'none';
+        }, 200);
+    }
+    
+    // Reset to default state regardless of previous state
+    aiAssistant.classList.remove('expanded');
+    
+    // If history view is active, switch back to chat view
+    if (aiAssistant.classList.contains('history-view')) {
+        hideHistoryView();
+    }
+    
+    // Position in right bottom corner
+    aiAssistant.style.top = 'auto';
+    aiAssistant.style.left = 'auto';
+    aiAssistant.style.right = '16px';
+    aiAssistant.style.bottom = '16px';
+    
+    // Reset the body height to default
+    const aiAssistantBody = document.querySelector('.ai-assistant-body');
+    aiAssistantBody.style.height = '350px';
+    
+    // Update resize button icon to expand
+    const resizeBtn = document.querySelector('.resize-btn');
+    resizeBtn.innerHTML = '<img src="images/expand-icon.svg" alt="Expand">';
+    resizeBtn.title = "Expand";
+    
+    // Set initial state for animation
+    aiAssistant.style.opacity = '0';
+    aiAssistant.style.transform = 'scale(0.3)';
+    aiAssistant.style.display = 'flex';
+    aiAssistant.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+    
+    // Trigger reflow to ensure the animation works
+    aiAssistant.offsetHeight;
+    
+    // Animate to full size
+    aiAssistant.style.opacity = '1';
+    aiAssistant.style.transform = 'scale(1)';
+    
+    // Remove transition after animation completes
+    setTimeout(() => {
+        aiAssistant.style.transition = '';
+    }, 300);
 }
 
 
@@ -2263,12 +1504,16 @@ function setupMentionFeature() {
     
     // Add input event listener to check for @ symbol and manage mention modal visibility
     inputField.addEventListener('input', function(e) {
+        console.log("INPUT EVENT TRIGGERED - Mention Detection");
         // First check if there's an @ symbol in the text
         const text = this.value;
         const cursorPosition = this.selectionStart;
+        console.log("Input text:", text);
+        console.log("Cursor position:", cursorPosition);
         
         // If there's no @ symbol in the text at all, close any open mention modal or tooltip
         if (!text.includes('@')) {
+            console.log("No @ found - Closing modal if open");
             if (mentionTooltip) {
                 mentionTooltip.remove();
                 mentionTooltip = null;
@@ -2282,6 +1527,7 @@ function setupMentionFeature() {
         
         // Continue with existing mention logic only if @ exists
         const mentionText = getMentionTextAtCursor(text, cursorPosition);
+        console.log("Mention text at cursor:", mentionText);
         
         if (mentionText !== null) {
             if (!isMentioning) {
@@ -2645,6 +1891,7 @@ function setupMentionFeature() {
     }
     
     function insertMention(name) {
+        console.log("INSERT MENTION called for name:", name);
         // Get the input field directly
         const input = document.querySelector('.ai-assistant-input');
         if (!input) return;
@@ -2652,6 +1899,8 @@ function setupMentionFeature() {
 
         const cursorPos = input.selectionStart;
         const text = input.value;
+        console.log("Before insertion - input value:", text);
+        console.log("Cursor position:", cursorPos);
         
         // Find the position of the @ symbol before the cursor
         let atPos = text.lastIndexOf('@', cursorPos - 1);
@@ -2661,6 +1910,7 @@ function setupMentionFeature() {
         const beforeMention = text.substring(0, atPos);
         const afterMention = text.substring(cursorPos);
         input.value = beforeMention + '@' + name + ' ' + afterMention;
+        console.log("After insertion - input value:", input.value);
         
         // Set cursor position after the inserted mention
         const newCursorPos = atPos + name.length + 2; // +2 for @ and space
@@ -2669,8 +1919,10 @@ function setupMentionFeature() {
         
         // Close the mention modal
         if (typeof window.closeMentionModal === 'function') {
+            console.log("Calling closeMentionModal from insertMention");
             window.closeMentionModal();
         } else {
+            console.log("window.closeMentionModal not available in insertMention");
             // Fallback if global function is not available
             if (window.mentionModal && window.mentionModal.parentNode) {
                 window.mentionModal.parentNode.removeChild(window.mentionModal);
@@ -2683,42 +1935,65 @@ function setupMentionFeature() {
             window.isMentioning = false;
         }
         
+        // Note that we're about to trigger an input event
+        console.log("About to dispatch input event. Current input.value:", input.value);
+        
         // Trigger input event to update any dependent state
         const inputEvent = new Event('input', { bubbles: true });
         input.dispatchEvent(inputEvent);
+        console.log("Input event dispatched");
     }
     
     // Make closeMentionModal accessible globally
     window.closeMentionModal = function() {
+        console.log("CLOSE MENTION MODAL CALLED");
+        console.log("Before reset - window.isMentioning:", window.isMentioning);
+        console.log("Before reset - local isMentioning:", isMentioning);
+        
         // Reset mention state
         window.isMentioning = false;
         isMentioning = false;
         mentionText = '';
         
+        console.log("After reset - window.isMentioning:", window.isMentioning);
+        console.log("After reset - local isMentioning:", isMentioning);
+        
         // Remove tooltip if it exists
         if (window.mentionTooltip) {
+            console.log("Removing window.mentionTooltip");
             try {
                 if (window.mentionTooltip.parentNode) {
                     window.mentionTooltip.parentNode.removeChild(window.mentionTooltip);
+                    console.log("window.mentionTooltip removed from DOM");
+                } else {
+                    console.log("window.mentionTooltip exists but is not in DOM");
                 }
             } catch (e) {
                 console.error("Error removing tooltip:", e);
             }
             window.mentionTooltip = null;
             mentionTooltip = null;
+        } else {
+            console.log("No tooltip to remove");
         }
         
         // Remove modal if it exists
         if (window.mentionModal) {
+            console.log("Removing window.mentionModal");
             try {
                 if (window.mentionModal.parentNode) {
                     window.mentionModal.parentNode.removeChild(window.mentionModal);
+                    console.log("window.mentionModal removed from DOM");
+                } else {
+                    console.log("window.mentionModal exists but is not in DOM");
                 }
             } catch (e) {
                 console.error("Error removing modal:", e);
             }
             window.mentionModal = null;
             mentionModal = null;
+        } else {
+            console.log("No modal to remove");
         }
     };
 } 
