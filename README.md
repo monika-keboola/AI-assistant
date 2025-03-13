@@ -52,5 +52,3 @@ This is a prototype implementation of the Keboola AI Assistant based on the Prod
 - Persistent chat history across sessions
 - More advanced context detection
 - Enhanced error handling and debugging assistance 
-
-bla
